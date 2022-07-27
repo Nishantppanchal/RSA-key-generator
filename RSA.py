@@ -1,8 +1,14 @@
 import random
-from math import floor, sqrt, ceil, gcd, lcm
+from math import floor, sqrt, ceil, gcd
 import numpy as np
 import os
 import pickle
+
+try: 
+  from math import lcm
+except:
+  def lcm(a, b):
+    return int((a * b) / gcd(a,b))
 
 def bits_to_file_name(bits):
     return f'{bits}bitsPrimes'
