@@ -1,7 +1,5 @@
 import random
 from math import floor, sqrt, ceil, gcd, lcm
-import sys
-from numpy import number
 import numpy as np
 import os
 import pickle
