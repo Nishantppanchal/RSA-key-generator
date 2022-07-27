@@ -259,4 +259,5 @@ if __name__ == "__main__":
         print('#------Deleting-Primes-Set------#')
         bits = input("Enter Key Bits: ")
         fileName = bits_to_file_name(bits)
-        os.remove(fileName)
+        if os.path.exists(fileName):
+          os.remove(fileName)
