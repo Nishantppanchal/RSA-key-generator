@@ -30,7 +30,7 @@ def printProgressBar(iteration, total, prefix='', suffix='', decimals=1, length=
     percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
     filledLength = int(length * iteration // total)
     bar = fill * filledLength + '-' * (length - filledLength)
-    print(f'\r{prefix} |{bar}| {percent}% {suffix}', end=printEnd)
+    print(f'\r{prefix} |{bar}| {percent}% {suffix} completed: {iteration}/{total}', end=printEnd)
     # Print New Line on Complete
     if iteration == total:
         print()
@@ -131,6 +131,61 @@ def generate_key_with_custom_RSA_algorithm(bits):
     # Return keys as tuple: (e,d,n)
     return e, d, n, λ
 
+def generate_key_with_custom_RSA_algorithm_efficient_prime_finder(bits):
+
+    # Creates numFrom and numTo, which are used in the for loop to test for prime numbers
+    numFrom = int(2**((bits-1)/2))
+    numTo = int(2**(bits/2))
+
+    print('Calculating RSA keys')
+    
+    while True:
+        aArray = [random.randint(0, numTo)] * 100
+        
+        pGenerated = False
+        while not pGenerated:
+            p = random.randint(numFrom, numTo)
+            for a in aArray:
+                if a % p != 0:
+                    if ((a**(p-1)) - 1) % p != 0:
+                        pGenerated = False
+                        break
+                    else: 
+                        pGenerated = True
+        
+        qGenerated = False
+        while not qGenerated:
+            q = random.randint(numFrom, numTo)
+            for a in aArray:
+                if a % p != 0:
+                    if ((a**(q-1)) - 1) % q != 0:
+                        qGenerated = False
+                        break
+                    else: 
+                        qGenerated = True
+        print(p, q)
+
+        # gets the n value
+        n = p*q
+
+        # Computes λ(n) where λ is Carmichael's totient function
+        λ = lcm(p-1, q-1)
+
+        d = 0
+        e = 0
+
+        eFound = False
+        while not eFound:
+            e = random.randint(2, λ - 1)
+            if gcd(e, λ) == 1:
+                eFound = True
+
+        d = pow(e, -1, λ)
+
+        if (d * e - 1) % λ == 0:
+            return e, d, n, λ
+        # Return keys as tuple: (e,d,n)
+
 
 def find_max_char_per_block(n):
     maxCharPerBlock = 0
@@ -226,38 +281,39 @@ def decrypt_message_gui(n, d, encryptedText):
 
 
 if __name__ == "__main__":
-    print('Menu Options:')
-    print('1. Generate Key')
-    print('2. Encrypt Message')
-    print('3. Decrypt Message')
-    print('4. Delete Primes Set')
-    menuOption = input('Select a menu option: ')
-    if menuOption == '1':
-        e, d, n = generate_keys_gui()
+    generate_key_with_custom_RSA_algorithm_efficient_prime_finder(128)
+    # print('Menu Options:')
+    # print('1. Generate Key')
+    # print('2. Encrypt Message')
+    # print('3. Decrypt Message')
+    # print('4. Delete Primes Set')
+    # menuOption = input('Select a menu option: ')
+    # if menuOption == '1':
+    #     e, d, n = generate_keys_gui()
 
-        encryptedText = encrypt_message_gui(n, e)
+    #     encryptedText = encrypt_message_gui(n, e)
 
-        decrypt_message_gui(n, d, encryptedText)
+    #     decrypt_message_gui(n, d, encryptedText)
 
-    if menuOption == '2':
-        print('Enter Public key components')
-        e = int(input(' e: '))
-        n = int(input(' n: '))
+    # if menuOption == '2':
+    #     print('Enter Public key components')
+    #     e = int(input(' e: '))
+    #     n = int(input(' n: '))
 
-        encrypt_message_gui(n, e)
+    #     encrypt_message_gui(n, e)
 
-    if menuOption == '3':
-        print('Enter Private key components')
-        d = int(input(' d: '))
-        n = int(input(' n: '))
+    # if menuOption == '3':
+    #     print('Enter Private key components')
+    #     d = int(input(' d: '))
+    #     n = int(input(' n: '))
 
-        encryptedMessage = input('Enter the encrypted message: ')
+    #     encryptedMessage = input('Enter the encrypted message: ')
 
-        decrypt_message_gui(n, d, encryptedMessage)
+    #     decrypt_message_gui(n, d, encryptedMessage)
 
-    if menuOption == '4':
-        print('#------Deleting-Primes-Set------#')
-        bits = input("Enter Key Bits: ")
-        fileName = bits_to_file_name(bits)
-        if os.path.exists(fileName):
-          os.remove(fileName)
+    # if menuOption == '4':
+    #     print('#------Deleting-Primes-Set------#')
+    #     bits = input("Enter Key Bits: ")
+    #     fileName = bits_to_file_name(bits)
+    #     if os.path.exists(fileName):
+    #       os.remove(fileName)
